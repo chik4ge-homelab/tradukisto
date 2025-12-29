@@ -1,0 +1,12 @@
+openapi: 3.0.4
+components:
+  schemas:
+    TranslateTextResponse:
+      type: object
+      properties:
+        translatedText:
+          type: string
+          description: The translated text.
+          example: "こんにちは、世界！"
+      required:
+        - translatedText

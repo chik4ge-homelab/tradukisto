@@ -1,0 +1,26 @@
+openapi: 3.0.4
+paths:
+  /api/v1/translate:
+    post:
+      tags:
+        - Translate
+      summary: Translate text
+      description: Translates the given text from source language to target language.
+      operationId: translateText
+      responses:
+        "200":
+          description: Successful translation
+          content:
+            application/json:
+              schema:
+                $ref: "../../responses/translate/translate.yaml#/components/schemas/TranslateTextResponse"
+        "400":
+          description: Bad Request - Invalid input parameters.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../requests/translate/translate.yaml#/components/schemas/TranslateTextRequest"
