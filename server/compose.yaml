@@ -1,0 +1,28 @@
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - llama-cache:/root/.cache/llama.cpp
+    ports:
+      - "8080:8080"
+    environment:
+      - LLAMA_ARG_HF_REPO=mmnga/plamo-2-translate-gguf:Q3_K_M
+      - LLAMA_ARG_HOST=0.0.0.0
+      - LLAMA_ARG_PORT=8080
+      - LLAMA_ARG_CTX_SIZE=8192
+      - LLAMA_ARG_N_PARALLEL=2
+      - LLAMA_ARG_N_SEQ_MAX=2
+      - LLAMA_ARG_CTX_SEQ=4096
+      - LLAMA_ARG_N_PREDICT=8192
+      - LLAMA_ARG_BATCH=256
+      - LLAMA_ARG_UBATCH=256
+
+volumes:
+  llama-cache:
