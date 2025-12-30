@@ -1,0 +1,37 @@
+resolver 127.0.0.11 ipv6=off valid=5s;
+
+upstream client_upstream {
+  zone client_upstream 64k;
+  server client:80 resolve;
+}
+
+upstream server_upstream {
+  zone server_upstream 64k;
+  server server:8081 resolve;
+}
+
+server {
+  listen 80;
+  server_name _;
+
+  location /api/ {
+    proxy_pass http://server_upstream;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+    proxy_buffering off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Authorization "Bearer ${API_BEARER_TOKEN}";
+  }
+
+  location / {
+    proxy_pass http://client_upstream;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}

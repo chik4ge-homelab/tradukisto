@@ -1,0 +1,46 @@
+include:
+  - ./server/compose.yaml
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      - LLAMA_BASE_URL=http://llama:8080
+      - LLAMA_API_KEY=dummy
+      - TRANSLATOR_BEARER_TOKEN=test-token
+    depends_on:
+      - llama
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/actuator/health/readiness > /dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      args:
+        VITE_BEARER_TOKEN: ""
+        VITE_API_BASE_URL: ""
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8088:80"
+    volumes:
+      - ./dev/docker/nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      - API_BEARER_TOKEN=test-token
+    depends_on:
+      client:
+        condition: service_healthy
+      server:
+        condition: service_healthy
