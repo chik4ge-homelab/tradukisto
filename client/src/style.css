@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui,
+    sans-serif;
+}
+
+.app-bg {
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, oklch(var(--b1)) 80%, #f59e0b 20%), transparent 55%),
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, oklch(var(--b1)) 75%, #38bdf8 25%), transparent 45%),
+    linear-gradient(180deg, oklch(var(--b1)) 0%, oklch(var(--b2)) 100%);
+}
+
+.app-shell {
+  background: linear-gradient(135deg, oklch(var(--b1)) 0%, oklch(var(--b2)) 100%);
+}
+
+.glass-panel {
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, oklch(var(--b1)) 78%, transparent);
+}
+
+.badge-pill {
+  @apply badge badge-outline text-xs font-medium;
+}
+
+.auto-textarea {
+  overflow: hidden;
+  resize: none;
+  line-height: 1.6;
+}
