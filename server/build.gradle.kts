@@ -35,6 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     developmentOnly("org.springframework.ai:spring-ai-spring-boot-docker-compose")
@@ -60,10 +61,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+val openApiGeneratedDir = layout.buildDirectory.dir("generated")
+
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$rootDir/../specs/openapi.yaml")
-    outputDir.set("$buildDir/generated")
+    outputDir.set(openApiGeneratedDir.map { it.asFile.absolutePath })
     apiPackage.set("me.chik4ge.tradukisto.openapi")
     skipOperationExample.set(true)
     // invokerPackage.set("me.chik4ge.tradukisto.openapi.invoker")
@@ -82,13 +85,13 @@ openApiGenerate {
 tasks.named("openApiGenerate") {
     inputs.dir("$rootDir/../specs")
     doFirst {
-        delete(layout.buildDirectory.dir("generated"))
+        delete(openApiGeneratedDir)
     }
 }
 
 sourceSets {
     main {
-        kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+        kotlin.srcDir(openApiGeneratedDir.map { it.dir("src/main/kotlin") })
     }
 }
 
@@ -99,7 +102,7 @@ tasks.named("compileKotlin") {
 detekt {
     buildUponDefaultConfig = true
     allRules = false
-    source = files("src/main/kotlin", "src/test/kotlin")
+    source.setFrom(files("src/main/kotlin", "src/test/kotlin"))
     config.setFrom(files("$rootDir/detekt.yml"))
 }
 
