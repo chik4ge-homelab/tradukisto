@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: tradukisto
+  ai:
+    openai:
+      base-url: ${LLAMA_BASE_URL:http://localhost:8080}
+      api-key: ${LLAMA_API_KEY:hogehoge}
+      chat:
+        options:
+          model: plamo2-translate
+          temperature: 0
+server:
+  port: 8081
+
+app:
+  auth:
+    bearer-token: ${TRANSLATOR_BEARER_TOKEN:}
