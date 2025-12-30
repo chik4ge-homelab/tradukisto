@@ -40,6 +40,14 @@ class TranslateService(
             .content()
             .filter { it != null }
             .map { it!! }
+            .index()
+            .map { indexed ->
+                if (indexed.t1 == 0L) {
+                    indexed.t2.trimStart()
+                } else {
+                    indexed.t2
+                }
+            }
     }
 
     private fun buildPrompts(request: TranslateTextRequest): Prompts {
