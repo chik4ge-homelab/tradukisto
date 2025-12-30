@@ -42,10 +42,16 @@ class TranslateService(
             .map { it!! }
             .index()
             .map { indexed ->
-                if (indexed.t1 == 0L) {
-                    indexed.t2.trimStart()
+                val chunk =
+                    if (indexed.t1 == 0L) {
+                        indexed.t2.trimStart()
+                    } else {
+                        indexed.t2
+                    }
+                if (chunk.startsWith(" ")) {
+                    " $chunk"
                 } else {
-                    indexed.t2
+                    chunk
                 }
             }
     }
