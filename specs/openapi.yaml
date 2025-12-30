@@ -7,6 +7,8 @@ info:
 paths:
   /api/v1/translate:
     $ref: "./paths/translate/translate.yaml#/paths/~1api~1v1~1translate"
+  /api/v1/translate/stream:
+    $ref: "./paths/translate/translate-stream.yaml#/paths/~1api~1v1~1translate~1stream"
 
 components:
   securitySchemes:

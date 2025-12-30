@@ -11,24 +11,18 @@ class TranslateService(
 ) {
     private val chatClient = chatClientBuilder.build()
 
-    fun translate(request: TranslateTextRequest): String {
-        val systemPrompt =
-            """
-            <|plamo:op|>dataset
-            translation
-            """.trimIndent()
+    private data class Prompts(
+        val system: String,
+        val user: String,
+    )
 
-        val userPrompt =
-            """
-            <|plamo:op|>input lang=${request.sourceLanguage}
-            ${request.text}
-            <|plamo:op|>output lang=${request.targetLanguage}
-            """.trimIndent()
+    fun translate(request: TranslateTextRequest): String {
+        val prompts = buildPrompts(request)
 
         return chatClient
             .prompt()
-            .system(systemPrompt)
-            .user(userPrompt)
+            .system(prompts.system)
+            .user(prompts.user)
             .call()
             .content()
             ?.trim()
@@ -36,6 +30,19 @@ class TranslateService(
     }
 
     fun translateStream(request: TranslateTextRequest): Flux<String> {
+        val prompts = buildPrompts(request)
+
+        return chatClient
+            .prompt()
+            .system(prompts.system)
+            .user(prompts.user)
+            .stream()
+            .content()
+            .filter { it != null }
+            .map { it!! }
+    }
+
+    private fun buildPrompts(request: TranslateTextRequest): Prompts {
         val systemPrompt =
             """
             <|plamo:op|>dataset
@@ -49,13 +56,9 @@ class TranslateService(
             <|plamo:op|>output lang=${request.targetLanguage}
             """.trimIndent()
 
-        return chatClient
-            .prompt()
-            .system(systemPrompt)
-            .user(userPrompt)
-            .stream()
-            .content()
-            .filter { it != null }
-            .map { it!! }
+        return Prompts(
+            system = systemPrompt,
+            user = userPrompt,
+        )
     }
 }
