@@ -261,8 +261,7 @@ const translate = async () => {
       const dataLines = [];
       for (const line of eventChunk.split("\n")) {
         if (!line.startsWith("data:")) continue;
-        const value = line.slice(5);
-        const content = value.startsWith(" ") ? value.slice(1) : value;
+        const content = line.startsWith("data: ") ? line.slice(6) : line.slice(5);
         if (content === "[DONE]") return;
         dataLines.push(content);
       }
