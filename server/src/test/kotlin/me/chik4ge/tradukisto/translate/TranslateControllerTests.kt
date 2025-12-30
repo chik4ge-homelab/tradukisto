@@ -2,7 +2,6 @@ package me.chik4ge.tradukisto.translate
 
 import me.chik4ge.tradukisto.openapi.model.TranslateTextRequest
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -14,11 +13,7 @@ import reactor.core.publisher.Flux
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 
-@SpringBootTest(
-    properties = [
-        "app.auth.bearer-token=test-token",
-    ],
-)
+@SpringBootTest
 @AutoConfigureWebTestClient
 class TranslateControllerTests {
     @Autowired
@@ -28,30 +23,7 @@ class TranslateControllerTests {
     private lateinit var translateService: TranslateService
 
     @Test
-    fun `Bearerが無い場合は401になる`() {
-        val body =
-            """
-            {
-              "sourceLanguage": "English",
-              "targetLanguage": "Japanese",
-              "text": "Hello, world!"
-            }
-            """.trimIndent()
-
-        webTestClient
-            .post()
-            .uri("/api/v1/translate")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(body)
-            .exchange()
-            .expectStatus()
-            .isUnauthorized
-
-        verifyNoInteractions(translateService)
-    }
-
-    @Test
-    fun `Bearerが一致すれば翻訳結果を返す`() {
+    fun `翻訳結果を返す`() {
         val body =
             """
             {
@@ -67,7 +39,6 @@ class TranslateControllerTests {
         webTestClient
             .post()
             .uri("/api/v1/translate")
-            .header("Authorization", "Bearer test-token")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .exchange()
@@ -98,7 +69,6 @@ class TranslateControllerTests {
             webTestClient
                 .post()
                 .uri("/api/v1/translate/stream")
-                .header("Authorization", "Bearer test-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .bodyValue(body)

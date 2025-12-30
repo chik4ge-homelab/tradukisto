@@ -11,7 +11,3 @@ spring:
           temperature: 0
 server:
   port: 8081
-
-app:
-  auth:
-    bearer-token: test-token

@@ -149,7 +149,6 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 const useStream = ref(true);
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
-const bearerToken = (import.meta.env.VITE_BEARER_TOKEN || "").trim();
 const isDark = ref(true);
 const textAreaRef = ref(null);
 const debounceMs = 500;
@@ -229,8 +228,7 @@ const translate = async () => {
       signal: inFlightController.signal,
       headers: {
         "Content-Type": "application/json",
-        Accept: useStream.value ? "text/event-stream" : "application/json",
-        ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {})
+        Accept: useStream.value ? "text/event-stream" : "application/json"
       },
       body: JSON.stringify({
         sourceLanguage: sourceLanguage.value,
