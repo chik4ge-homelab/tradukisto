@@ -7,10 +7,6 @@ on:
     tags:
       - "v*"
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -19,12 +15,12 @@ jobs:
         include:
           - name: client
             dockerfile: client/Dockerfile
-            image: ${{ env.REGISTRY }}/${{ github.repository }}-client
+            image: ghcr.io/${{ github.repository }}-client
             build-args: |
               VITE_API_BASE_URL=
           - name: server
             dockerfile: server/Dockerfile
-            image: ${{ env.REGISTRY }}/${{ github.repository }}-server
+            image: ghcr.io/${{ github.repository }}-server
             build-args: ""
 
     permissions:
@@ -40,7 +36,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,6 +51,7 @@ jobs:
             type=sha
 
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
