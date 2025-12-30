@@ -32,10 +32,11 @@ extra["springAiVersion"] = "1.1.2"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
+    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     developmentOnly("org.springframework.ai:spring-ai-spring-boot-docker-compose")
@@ -64,7 +65,7 @@ tasks.withType<Test> {
 val openApiGeneratedDir = layout.buildDirectory.dir("generated")
 
 openApiGenerate {
-    generatorName.set("kotlin-spring")
+    generatorName.set("spring")
     inputSpec.set("$rootDir/../specs/openapi.yaml")
     outputDir.set(openApiGeneratedDir.map { it.asFile.absolutePath })
     apiPackage.set("me.chik4ge.tradukisto.openapi")
@@ -78,6 +79,9 @@ openApiGenerate {
             "dateLibrary" to "java8",
             "useTags" to "true",
             "useSpringBoot3" to "true",
+            "reactive" to "true",
+            "sse" to "true",
+            "useResponseEntity" to "false",
         ),
     )
 }
@@ -92,10 +96,15 @@ tasks.named("openApiGenerate") {
 sourceSets {
     main {
         kotlin.srcDir(openApiGeneratedDir.map { it.dir("src/main/kotlin") })
+        java.srcDir(openApiGeneratedDir.map { it.dir("src/main/java") })
     }
 }
 
 tasks.named("compileKotlin") {
+    dependsOn("openApiGenerate")
+}
+
+tasks.named("compileJava") {
     dependsOn("openApiGenerate")
 }
 

@@ -1,33 +1,31 @@
 package me.chik4ge.tradukisto.security
 
-import jakarta.servlet.FilterChain
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpStatus
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.server.WebFilter
+import org.springframework.web.server.WebFilterChain
+import reactor.core.publisher.Mono
 
 @Component
 class BearerAuthFilter(
     @Value("\${app.auth.bearer-token:}") private val bearerToken: String,
-) : OncePerRequestFilter() {
-    override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain,
-    ) {
-        if (request.requestURI.startsWith("/api/")) {
+) : WebFilter {
+    override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+        val path = exchange.request.uri.path
+        if (path.startsWith("/api/")) {
             val expected = bearerToken
-            val header = request.getHeader("Authorization").orEmpty()
+            val header = exchange.request.headers.getFirst("Authorization").orEmpty()
             val prefix = "Bearer "
             val provided = if (header.startsWith(prefix)) header.substring(prefix.length) else ""
             val allowed = expected.isNotBlank() && provided == expected
             if (!allowed) {
-                response.status = HttpServletResponse.SC_UNAUTHORIZED
-                return
+                exchange.response.statusCode = HttpStatus.UNAUTHORIZED
+                return exchange.response.setComplete()
             }
         }
 
-        filterChain.doFilter(request, response)
+        return chain.filter(exchange)
     }
 }

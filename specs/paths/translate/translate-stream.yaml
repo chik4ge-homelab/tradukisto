@@ -1,0 +1,29 @@
+openapi: 3.0.4
+paths:
+  /api/v1/translate/stream:
+    post:
+      tags:
+        - Translate
+      summary: Translate text (stream)
+      description: Translates the given text from source language to target language as a text/event-stream.
+      x-sse: true
+      operationId: translateTextStream
+      responses:
+        "200":
+          description: Successful translation (stream)
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Bad Request - Invalid input parameters.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../requests/translate/translate.yaml#/components/schemas/TranslateTextRequest"
